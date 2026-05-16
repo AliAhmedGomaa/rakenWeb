@@ -1,0 +1,184 @@
+<main class="page">
+  <header class="topbar">
+    <a class="brand" routerLink="/">
+      <span class="logo-dot"></span>
+      <span class="brand-name">RAKEN</span>
+    </a>
+  </header>
+
+  @switch (status) {
+    @case ('loading') {
+      <section class="state">
+        <div class="spinner"></div>
+        <p>Loading car…</p>
+      </section>
+    }
+
+    @case ('not-found') {
+      <section class="state">
+        <div class="state-icon">🚗</div>
+        <h2>This QR isn't active.</h2>
+        <p>The owner may have removed it or it may have been mistyped.</p>
+        <a class="btn btn-secondary" routerLink="/">Back to home</a>
+      </section>
+    }
+
+    @case ('error') {
+      <section class="state">
+        <div class="state-icon error">!</div>
+        <h2>Something went wrong</h2>
+        <p>{{ errorMessage }}</p>
+      </section>
+    }
+
+    @case ('ready') {
+      @if (car) {
+      <section class="card car">
+        <div class="plate">
+          <span class="plate-label">PLATE</span>
+          <span class="plate-value">{{ car.plate }}</span>
+        </div>
+
+        <h1 class="car-name">{{ carLabel }}</h1>
+        <div class="car-meta">
+          <span class="badge color" [attr.data-color]="car.color">
+            <span class="color-dot" [class]="'c-' + car.color"></span>
+            {{ car.color | titlecase }}
+          </span>
+          @if (car.year) {
+            <span class="badge">{{ car.year }}</span>
+          }
+          <span class="badge">{{ car.make }} {{ car.model }}</span>
+        </div>
+
+        <p class="intro">
+          You're scanning <strong>{{ car.owner.firstName }}'s</strong> car.
+          Drop a message — they'll see it instantly in the Raken app.
+        </p>
+
+        @if (!car.acceptingContact) {
+          <div class="banner warning">
+            The owner has temporarily paused contact for this car.
+          </div>
+        }
+
+        <div class="actions">
+          <button
+            type="button"
+            class="action chat"
+            [disabled]="!car.acceptingContact"
+            (click)="openComposer()"
+          >
+            <span class="action-icon">💬</span>
+            <span class="action-label">Send a chat</span>
+            <span class="action-sub">Anonymous in-app message</span>
+          </button>
+
+          @if (hasMethod('call')) {
+            <a
+              class="action call"
+              [class.disabled]="!car.acceptingContact"
+              [attr.href]="car.acceptingContact ? callHref : null"
+            >
+              <span class="action-icon">📞</span>
+              <span class="action-label">Call</span>
+              <span class="action-sub">{{ car.owner.phone }}</span>
+            </a>
+          }
+
+          @if (hasMethod('sms')) {
+            <a
+              class="action sms"
+              [class.disabled]="!car.acceptingContact"
+              [attr.href]="car.acceptingContact ? smsHref : null"
+            >
+              <span class="action-icon">✉️</span>
+              <span class="action-label">SMS</span>
+              <span class="action-sub">Send a quick text</span>
+            </a>
+          }
+        </div>
+
+        @if (composerOpen) {
+          <div class="composer">
+            <div class="composer-head">
+              <div class="composer-title">
+                <span class="composer-title-dot"></span>
+                In-app chat
+              </div>
+              <button
+                type="button"
+                class="link-btn"
+                (click)="closeComposer()"
+                aria-label="Hide chat"
+              >
+                Hide
+              </button>
+            </div>
+
+            @if (messages.length > 0) {
+              <div #messageList class="messages">
+                @for (msg of messages; track msg.id) {
+                  <div
+                    class="msg"
+                    [class.mine]="msg.senderId === 'me'"
+                    [class.other]="msg.senderId !== 'me'"
+                  >
+                    <div class="bubble">{{ msg.text }}</div>
+                    <div class="meta">
+                      {{ msg.timestamp | date: 'shortTime' }}
+                      @if (msg.senderId === 'me') {
+                        <span class="status status-{{ msg.status }}">
+                          · {{ msg.status }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <form
+              class="composer-form"
+              (submit)="$event.preventDefault(); sendMessage()"
+            >
+              <textarea
+                rows="3"
+                placeholder="Type your message — e.g. ‘Hi, your car is blocking my exit.’"
+                [(ngModel)]="text"
+                name="message"
+                maxlength="4000"
+                [disabled]="chatStatus === 'sending'"
+              ></textarea>
+
+              @if (chatError) {
+                <div class="form-error">{{ chatError }}</div>
+              }
+
+              <div class="composer-actions">
+                <span class="hint">
+                  Your identity is never shared. The owner sees a label like
+                  “Anonymous #1”.
+                </span>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="!text.trim() || chatStatus === 'sending'"
+                >
+                  @if (chatStatus === 'sending') {
+                    Sending…
+                  } @else {
+                    Send message
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <footer class="powered">Powered by Raken</footer>
+      </section>
+      }
+    }
+  }
+</main>

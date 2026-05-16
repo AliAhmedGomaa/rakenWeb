@@ -1,0 +1,464 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--rk-primary-light), transparent 55%),
+    var(--rk-bg);
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px 16px 32px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px 22px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rk-primary);
+}
+
+.logo-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--rk-primary) 0%, #6a44ff 100%);
+}
+
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 4px;
+  font-size: 13px;
+}
+
+/* ─── Generic state (loading / not-found / error) ───────────────── */
+.state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--rk-white);
+  border-radius: var(--rk-radius-lg);
+  border: 1px solid var(--rk-border);
+  box-shadow: var(--rk-shadow-sm);
+}
+
+.state h2 {
+  margin: 12px 0 6px;
+  font-size: 20px;
+}
+
+.state p {
+  margin: 0 0 16px;
+  color: var(--rk-text-secondary);
+  font-size: 14px;
+}
+
+.state-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  background: var(--rk-primary-light);
+}
+
+.state-icon.error {
+  background: #fce7eb;
+  color: var(--rk-danger);
+  font-weight: 800;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--rk-border);
+  border-top-color: var(--rk-primary);
+  margin: 0 auto 14px;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Car card ──────────────────────────────────────────────────── */
+.card {
+  background: var(--rk-white);
+  border-radius: var(--rk-radius-lg);
+  border: 1px solid var(--rk-border);
+  box-shadow: var(--rk-shadow);
+  padding: 28px 24px;
+}
+
+.plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--rk-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 18px;
+}
+
+.plate-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--rk-text-muted);
+}
+
+.plate-value {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: var(--rk-text);
+}
+
+.car-name {
+  margin: 0 0 10px;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: var(--rk-text);
+}
+
+.car-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.badge {
+  background: var(--rk-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--rk-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge.color {
+  text-transform: capitalize;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.c-white   { background: #f4f6fa; }
+.c-silver  { background: #c7cbd5; }
+.c-black   { background: #1b1d26; }
+.c-red     { background: #e02424; }
+.c-blue    { background: #1e4fd6; }
+.c-green   { background: #22a06b; }
+.c-yellow  { background: #f5b400; }
+.c-gray    { background: #5a5f7d; }
+
+.intro {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+  margin: 0 0 18px;
+}
+
+.intro strong {
+  color: var(--rk-text);
+}
+
+.banner {
+  border-radius: var(--rk-radius);
+  padding: 12px 14px;
+  font-size: 13.5px;
+  margin-bottom: 18px;
+}
+
+.banner.warning {
+  background: #fff5d6;
+  border: 1px solid #ffe18a;
+  color: #8a6500;
+}
+
+/* ─── Action buttons ────────────────────────────────────────────── */
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.action {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  text-align: left;
+  border-radius: var(--rk-radius);
+  padding: 14px;
+  border: 1px solid var(--rk-border);
+  background: var(--rk-white);
+  cursor: pointer;
+  transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+  color: var(--rk-text);
+  font: inherit;
+}
+
+.action:hover {
+  background: var(--rk-surface);
+}
+
+.action:active {
+  transform: scale(0.99);
+}
+
+.action.disabled,
+.action[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.action-icon {
+  grid-row: 1 / span 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  margin-right: 14px;
+  background: var(--rk-primary-light);
+}
+
+.action.call .action-icon {
+  background: color-mix(in srgb, var(--rk-call-green) 16%, white);
+}
+
+.action.sms .action-icon {
+  background: color-mix(in srgb, var(--rk-sms-blue) 16%, white);
+}
+
+.action.chat .action-icon {
+  background: color-mix(in srgb, var(--rk-chat-purple) 16%, white);
+}
+
+.action-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rk-text);
+}
+
+.action-sub {
+  font-size: 12.5px;
+  color: var(--rk-text-secondary);
+}
+
+/* ─── Composer / messages ───────────────────────────────────────── */
+.composer {
+  margin-top: 22px;
+  border-top: 1px solid var(--rk-border);
+  padding-top: 18px;
+}
+
+.composer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.composer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.composer-title-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rk-chat-purple);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rk-chat-purple) 18%, transparent);
+}
+
+.link-btn {
+  background: transparent;
+  border: 0;
+  color: var(--rk-text-secondary);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.messages {
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--rk-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius);
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+}
+
+.msg.mine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.msg.other {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.bubble {
+  padding: 9px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.35;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.msg.mine .bubble {
+  background: var(--rk-primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.msg.other .bubble {
+  background: white;
+  color: var(--rk-text);
+  border: 1px solid var(--rk-border);
+  border-bottom-left-radius: 4px;
+}
+
+.meta {
+  font-size: 10.5px;
+  color: var(--rk-text-muted);
+  margin-top: 4px;
+}
+
+.composer-form textarea {
+  width: 100%;
+  resize: none;
+  border-radius: var(--rk-radius);
+  border: 1px solid var(--rk-border);
+  background: var(--rk-white);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--rk-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.composer-form textarea:focus {
+  border-color: var(--rk-primary);
+  box-shadow: 0 0 0 4px var(--rk-primary-light);
+}
+
+.form-error {
+  color: var(--rk-danger);
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.composer-actions .hint {
+  font-size: 11.5px;
+  color: var(--rk-text-muted);
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+}
+
+.btn {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.btn-primary {
+  background: var(--rk-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--rk-primary-dark);
+}
+
+.btn-secondary {
+  background: var(--rk-surface);
+  color: var(--rk-text);
+  border-color: var(--rk-border);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.powered {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--rk-text-muted);
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+  .car-name {
+    font-size: 22px;
+  }
+  .composer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .composer-actions .btn {
+    width: 100%;
+  }
+}

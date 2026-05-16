@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 10% 0%, var(--rk-primary-light), transparent 60%),
+    radial-gradient(120% 80% at 90% 100%, #f1eaff, transparent 55%),
+    var(--rk-bg);
+}
+
+.hero {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: var(--rk-white);
+  border-radius: var(--rk-radius-lg);
+  box-shadow: var(--rk-shadow);
+  border: 1px solid var(--rk-border);
+  padding: 40px;
+  max-width: 560px;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.logo-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--rk-primary) 0%, #6a44ff 100%);
+}
+
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--rk-primary);
+  font-size: 14px;
+}
+
+h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+  color: var(--rk-text);
+}
+
+p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+  margin: 0;
+}
+
+.hint {
+  margin-top: 24px;
+  background: var(--rk-primary-light);
+  border: 1px solid rgba(1, 95, 254, 0.15);
+  color: var(--rk-primary);
+  border-radius: var(--rk-radius);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.hint-bullet {
+  font-weight: 700;
+}
+
+.features {
+  margin-top: 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--rk-radius);
+  background: var(--rk-surface);
+  border: 1px solid var(--rk-border);
+}
+
+.feature-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c, var(--rk-primary));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c, var(--rk-primary)) 18%, transparent);
+}
+
+.feature-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--rk-text);
+}
+
+.feature-desc {
+  font-size: 12.5px;
+  color: var(--rk-text-secondary);
+  margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+  h1 {
+    font-size: 28px;
+  }
+}
