@@ -5,6 +5,7 @@ import {
   Component,
   ElementRef,
   Input,
+  OnDestroy,
   OnInit,
   PLATFORM_ID,
   ViewChild,
@@ -19,6 +20,7 @@ import type {
   PublicCar,
   VisitorMessage,
 } from '../../core/api.types';
+import { ChatSocketService } from '../../core/chat-socket.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { LanguageSwitcher } from '../../core/i18n/language-switcher';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -34,7 +36,7 @@ type ChatStatus = 'idle' | 'sending' | 'sent' | 'error';
   templateUrl: './scan-page.html',
   styleUrl: './scan-page.scss',
 })
-export class ScanPage implements OnInit, AfterViewChecked {
+export class ScanPage implements OnInit, AfterViewChecked, OnDestroy {
   /** Route param: pre-printed sticker code (`/c/:code`). */
   @Input() carId?: string;
 
@@ -42,6 +44,7 @@ export class ScanPage implements OnInit, AfterViewChecked {
 
   readonly i18n = inject(I18nService);
   private readonly api = inject(ApiService);
+  private readonly chatSocket = inject(ChatSocketService);
   private readonly tokens = inject(VisitorTokenService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly cd = inject(ChangeDetectorRef);
@@ -57,6 +60,7 @@ export class ScanPage implements OnInit, AfterViewChecked {
   chatError = '';
   messages: VisitorMessage[] = [];
   private shouldScrollOnNextCheck = false;
+  private socketUnsub: (() => void) | undefined;
 
   async ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -124,6 +128,7 @@ export class ScanPage implements OnInit, AfterViewChecked {
         visitorToken: token,
       });
       this.tokens.set(this.carId, res.visitorToken);
+      this.connectRealtime(res.chatId, res.visitorToken);
       this.messages = this.messages.map(m =>
         m.id === optimisticId
           ? { ...m, id: res.messageId, status: 'delivered' }
@@ -203,7 +208,12 @@ export class ScanPage implements OnInit, AfterViewChecked {
     if (!token) return;
     try {
       const thread = await this.api.getVisitorThread(this.carId, token);
-      this.messages = thread.messages;
+      this.messages = thread.messages.map(m =>
+        this.chatSocket.mapForVisitor(m),
+      );
+      if (thread.chatId) {
+        this.connectRealtime(thread.chatId, token);
+      }
       if (this.messages.length > 0) {
         this.composerOpen = true;
         this.shouldScrollOnNextCheck = true;
@@ -211,6 +221,22 @@ export class ScanPage implements OnInit, AfterViewChecked {
     } catch {
       // Non-fatal
     }
+  }
+
+  private connectRealtime(chatId: string, visitorToken: string) {
+    this.socketUnsub?.();
+    this.chatSocket.connectVisitor(chatId, visitorToken);
+    this.socketUnsub = this.chatSocket.onChatUpdated(update => {
+      this.messages = update.messages;
+      this.composerOpen = true;
+      this.shouldScrollOnNextCheck = true;
+      this.cd.markForCheck();
+    });
+  }
+
+  ngOnDestroy() {
+    this.socketUnsub?.();
+    this.chatSocket.disconnect();
   }
 
   private extractMessage(err: unknown): string | null {
