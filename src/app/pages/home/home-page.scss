@@ -10,9 +10,18 @@
 .hero {
   min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+.hero-top {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
 }
 
 .card {

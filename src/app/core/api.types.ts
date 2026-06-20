@@ -37,3 +37,9 @@ export interface VisitorThread {
   participantLabel: string | null;
   messages: VisitorMessage[];
 }
+
+export interface PublicSticker {
+  code: string;
+  assigned: boolean;
+  url: string;
+}

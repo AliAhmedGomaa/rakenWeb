@@ -1,42 +1,41 @@
 <main class="hero">
+  <div class="hero-top">
+    <rk-lang-switcher />
+  </div>
   <section class="card">
     <div class="brand">
       <span class="logo-dot"></span>
-      <span class="brand-name">RAKEN</span>
+      <span class="brand-name">{{ 'brand' | t }}</span>
     </div>
 
-    <h1>Anonymous contact for any car.</h1>
-    <p>
-      Raken gives every car a QR sticker. Scan it to send the owner a private
-      message, call, or text — without ever seeing their phone number.
-    </p>
+    <h1>{{ 'home.title' | t }}</h1>
+    <p>{{ 'home.body' | t }}</p>
 
     <div class="hint">
       <span class="hint-bullet">→</span>
-      Scan a Raken QR to get started, or download the Raken app to mint one
-      for your own car.
+      {{ 'home.hint' | t }}
     </div>
 
     <div class="features">
       <div class="feature">
         <div class="feature-dot" style="--c: var(--rk-chat-purple)"></div>
         <div>
-          <div class="feature-title">Anonymous chat</div>
-          <div class="feature-desc">Talk to the owner in-app.</div>
+          <div class="feature-title">{{ 'home.features.chatTitle' | t }}</div>
+          <div class="feature-desc">{{ 'home.features.chatDesc' | t }}</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-dot" style="--c: var(--rk-call-green)"></div>
         <div>
-          <div class="feature-title">One-tap call</div>
-          <div class="feature-desc">Reach them instantly if they shared a number.</div>
+          <div class="feature-title">{{ 'home.features.callTitle' | t }}</div>
+          <div class="feature-desc">{{ 'home.features.callDesc' | t }}</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-dot" style="--c: var(--rk-sms-blue)"></div>
         <div>
-          <div class="feature-title">SMS fallback</div>
-          <div class="feature-desc">Drop a quick text and walk away.</div>
+          <div class="feature-title">{{ 'home.features.smsTitle' | t }}</div>
+          <div class="feature-desc">{{ 'home.features.smsDesc' | t }}</div>
         </div>
       </div>
     </div>

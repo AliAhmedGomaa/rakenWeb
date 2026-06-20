@@ -5,6 +5,7 @@ import { API_BASE_URL } from './api.config';
 import type {
   ContactResponse,
   PublicCar,
+  PublicSticker,
   VisitorThread,
 } from './api.types';
 
@@ -37,6 +38,13 @@ export class ApiService {
         `${API_BASE_URL}/public/cars/${carId}/thread`,
         { params },
       ),
+    );
+  }
+
+  getStickerStatus(code: string): Promise<PublicSticker> {
+    const encoded = encodeURIComponent(code);
+    return firstValueFrom(
+      this.http.get<PublicSticker>(`${API_BASE_URL}/public/stickers/${encoded}`),
     );
   }
 }

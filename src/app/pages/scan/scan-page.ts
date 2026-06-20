@@ -19,24 +19,28 @@ import type {
   PublicCar,
   VisitorMessage,
 } from '../../core/api.types';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { LanguageSwitcher } from '../../core/i18n/language-switcher';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { VisitorTokenService } from '../../core/visitor-token.service';
 
-type Status = 'loading' | 'ready' | 'not-found' | 'error';
+type Status = 'loading' | 'ready' | 'not-found' | 'unassigned' | 'error';
 type ChatStatus = 'idle' | 'sending' | 'sent' | 'error';
 
 @Component({
   selector: 'rk-scan',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, LanguageSwitcher],
   templateUrl: './scan-page.html',
   styleUrl: './scan-page.scss',
 })
 export class ScanPage implements OnInit, AfterViewChecked {
-  /** Route param wired via `withComponentInputBinding()`. */
+  /** Route param: pre-printed sticker code (`/c/:code`). */
   @Input() carId?: string;
 
   @ViewChild('messageList') private messageList?: ElementRef<HTMLDivElement>;
 
+  readonly i18n = inject(I18nService);
   private readonly api = inject(ApiService);
   private readonly tokens = inject(VisitorTokenService);
   private readonly platformId = inject(PLATFORM_ID);
@@ -55,7 +59,6 @@ export class ScanPage implements OnInit, AfterViewChecked {
   private shouldScrollOnNextCheck = false;
 
   async ngOnInit() {
-    // SSR pass returns "loading" — the browser hydration kicks in below.
     if (!isPlatformBrowser(this.platformId)) return;
     if (!this.carId) {
       this.status = 'not-found';
@@ -73,7 +76,6 @@ export class ScanPage implements OnInit, AfterViewChecked {
     }
   }
 
-  // ── Public actions (used by the template) ────────────────────────────────
   openComposer() {
     this.composerOpen = true;
     this.shouldScrollOnNextCheck = true;
@@ -83,6 +85,18 @@ export class ScanPage implements OnInit, AfterViewChecked {
     this.composerOpen = false;
   }
 
+  colorLabel(color: string): string {
+    const key = `colors.${color}`;
+    const translated = this.i18n.t(key);
+    return translated === key ? color : translated;
+  }
+
+  statusLabel(status: string): string {
+    const key = `scan.status.${status}`;
+    const translated = this.i18n.t(key);
+    return translated === key ? status : translated;
+  }
+
   async sendMessage() {
     const trimmed = this.text.trim();
     if (!trimmed || !this.carId || this.chatStatus === 'sending') return;
@@ -90,7 +104,6 @@ export class ScanPage implements OnInit, AfterViewChecked {
     this.chatStatus = 'sending';
     this.chatError = '';
 
-    // Optimistic append so the user sees their bubble immediately.
     const optimisticId = `tmp_${Date.now()}`;
     const optimisticMsg: VisitorMessage = {
       id: optimisticId,
@@ -111,7 +124,6 @@ export class ScanPage implements OnInit, AfterViewChecked {
         visitorToken: token,
       });
       this.tokens.set(this.carId, res.visitorToken);
-      // Replace the optimistic entry with the canonical id from the server.
       this.messages = this.messages.map(m =>
         m.id === optimisticId
           ? { ...m, id: res.messageId, status: 'delivered' }
@@ -122,16 +134,14 @@ export class ScanPage implements OnInit, AfterViewChecked {
     } catch (err) {
       this.text = draftToRestore;
       this.messages = this.messages.filter(m => m.id !== optimisticId);
-      this.chatError = this.extractMessage(err) ?? 'Could not send. Try again.';
+      this.chatError =
+        this.extractMessage(err) ?? this.i18n.t('scan.sendError');
       this.chatStatus = 'error';
     } finally {
-      // Ensure the template re-evaluates after the awaited request resolves,
-      // otherwise the "Sending…" button label can stick on some setups.
       this.cd.markForCheck();
     }
   }
 
-  // ── Derived data ────────────────────────────────────────────────────────
   get carLabel(): string {
     if (!this.car) return '';
     return this.car.nickname ?? `${this.car.make} ${this.car.model}`;
@@ -146,14 +156,15 @@ export class ScanPage implements OnInit, AfterViewChecked {
   }
 
   get smsHref(): string | null {
-    return this.car?.owner.phone
-      ? `sms:${this.car.owner.phone}?body=${encodeURIComponent(
-          `Hi! I'm contacting you about your ${this.car.make} ${this.car.model} (${this.car.plate}).`,
-        )}`
-      : null;
+    if (!this.car?.owner.phone) return null;
+    const body = this.i18n.t('scan.smsBody', {
+      make: this.car.make,
+      model: this.car.model,
+      plate: this.car.plate,
+    });
+    return `sms:${this.car.owner.phone}?body=${encodeURIComponent(body)}`;
   }
 
-  // ── Internals ───────────────────────────────────────────────────────────
   private async loadCar() {
     this.status = 'loading';
     this.errorMessage = '';
@@ -162,15 +173,28 @@ export class ScanPage implements OnInit, AfterViewChecked {
       this.status = 'ready';
     } catch (err) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
+        try {
+          const sticker = await this.api.getStickerStatus(this.carId!);
+          if (!sticker.assigned) {
+            this.status = 'unassigned';
+            return;
+          }
+        } catch {
+          // fall through to not-found
+        }
         this.status = 'not-found';
         return;
       }
       this.errorMessage =
-        this.extractMessage(err) ?? 'We could not load this car right now.';
+        this.extractMessage(err) ?? this.i18n.t('scan.loadError');
       this.status = 'error';
     } finally {
       this.cd.markForCheck();
     }
+  }
+
+  get appDeepLink(): string {
+    return `raken://c/${encodeURIComponent(this.carId ?? '')}`;
   }
 
   private async hydrateThreadIfAny() {
@@ -185,7 +209,7 @@ export class ScanPage implements OnInit, AfterViewChecked {
         this.shouldScrollOnNextCheck = true;
       }
     } catch {
-      // Non-fatal — visitor can just start a new conversation.
+      // Non-fatal
     }
   }
 

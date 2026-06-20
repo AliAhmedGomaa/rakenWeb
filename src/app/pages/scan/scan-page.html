@@ -2,31 +2,42 @@
   <header class="topbar">
     <a class="brand" routerLink="/">
       <span class="logo-dot"></span>
-      <span class="brand-name">RAKEN</span>
+      <span class="brand-name">{{ 'brand' | t }}</span>
     </a>
+    <rk-lang-switcher />
   </header>
 
   @switch (status) {
     @case ('loading') {
       <section class="state">
         <div class="spinner"></div>
-        <p>Loading car…</p>
+        <p>{{ 'scan.loading' | t }}</p>
       </section>
     }
 
     @case ('not-found') {
       <section class="state">
         <div class="state-icon">🚗</div>
-        <h2>This QR isn't active.</h2>
-        <p>The owner may have removed it or it may have been mistyped.</p>
-        <a class="btn btn-secondary" routerLink="/">Back to home</a>
+        <h2>{{ 'scan.notFoundTitle' | t }}</h2>
+        <p>{{ 'scan.notFoundText' | t }}</p>
+        <a class="btn btn-secondary" routerLink="/">{{ 'scan.backHome' | t }}</a>
+      </section>
+    }
+
+    @case ('unassigned') {
+      <section class="state">
+        <div class="state-icon">📲</div>
+        <h2>{{ 'scan.unassignedTitle' | t }}</h2>
+        <p>{{ 'scan.unassignedText' | t }}</p>
+        <a class="btn btn-primary" [href]="appDeepLink">{{ 'scan.openApp' | t }}</a>
+        <a class="btn btn-secondary" routerLink="/">{{ 'scan.backHome' | t }}</a>
       </section>
     }
 
     @case ('error') {
       <section class="state">
         <div class="state-icon error">!</div>
-        <h2>Something went wrong</h2>
+        <h2>{{ 'scan.errorTitle' | t }}</h2>
         <p>{{ errorMessage }}</p>
       </section>
     }
@@ -35,7 +46,7 @@
       @if (car) {
       <section class="card car">
         <div class="plate">
-          <span class="plate-label">PLATE</span>
+          <span class="plate-label">{{ 'scan.plateLabel' | t }}</span>
           <span class="plate-value">{{ car.plate }}</span>
         </div>
 
@@ -43,7 +54,7 @@
         <div class="car-meta">
           <span class="badge color" [attr.data-color]="car.color">
             <span class="color-dot" [class]="'c-' + car.color"></span>
-            {{ car.color | titlecase }}
+            {{ colorLabel(car.color) }}
           </span>
           @if (car.year) {
             <span class="badge">{{ car.year }}</span>
@@ -52,13 +63,12 @@
         </div>
 
         <p class="intro">
-          You're scanning <strong>{{ car.owner.firstName }}'s</strong> car.
-          Drop a message — they'll see it instantly in the Raken app.
+          {{ 'scan.intro' | t: { name: car.owner.firstName } }}
         </p>
 
         @if (!car.acceptingContact) {
           <div class="banner warning">
-            The owner has temporarily paused contact for this car.
+            {{ 'scan.paused' | t }}
           </div>
         }
 
@@ -70,8 +80,8 @@
             (click)="openComposer()"
           >
             <span class="action-icon">💬</span>
-            <span class="action-label">Send a chat</span>
-            <span class="action-sub">Anonymous in-app message</span>
+            <span class="action-label">{{ 'scan.sendChat' | t }}</span>
+            <span class="action-sub">{{ 'scan.sendChatSub' | t }}</span>
           </button>
 
           @if (hasMethod('call')) {
@@ -81,7 +91,7 @@
               [attr.href]="car.acceptingContact ? callHref : null"
             >
               <span class="action-icon">📞</span>
-              <span class="action-label">Call</span>
+              <span class="action-label">{{ 'scan.call' | t }}</span>
               <span class="action-sub">{{ car.owner.phone }}</span>
             </a>
           }
@@ -93,8 +103,8 @@
               [attr.href]="car.acceptingContact ? smsHref : null"
             >
               <span class="action-icon">✉️</span>
-              <span class="action-label">SMS</span>
-              <span class="action-sub">Send a quick text</span>
+              <span class="action-label">{{ 'scan.sms' | t }}</span>
+              <span class="action-sub">{{ 'scan.smsSub' | t }}</span>
             </a>
           }
         </div>
@@ -104,15 +114,15 @@
             <div class="composer-head">
               <div class="composer-title">
                 <span class="composer-title-dot"></span>
-                In-app chat
+                {{ 'scan.chatTitle' | t }}
               </div>
               <button
                 type="button"
                 class="link-btn"
                 (click)="closeComposer()"
-                aria-label="Hide chat"
+                [attr.aria-label]="'scan.hideChat' | t"
               >
-                Hide
+                {{ 'scan.hideChat' | t }}
               </button>
             </div>
 
@@ -129,7 +139,7 @@
                       {{ msg.timestamp | date: 'shortTime' }}
                       @if (msg.senderId === 'me') {
                         <span class="status status-{{ msg.status }}">
-                          · {{ msg.status }}
+                          · {{ statusLabel(msg.status) }}
                         </span>
                       }
                     </div>
@@ -144,7 +154,7 @@
             >
               <textarea
                 rows="3"
-                placeholder="Type your message — e.g. ‘Hi, your car is blocking my exit.’"
+                [placeholder]="'scan.messagePlaceholder' | t"
                 [(ngModel)]="text"
                 name="message"
                 maxlength="4000"
@@ -156,19 +166,16 @@
               }
 
               <div class="composer-actions">
-                <span class="hint">
-                  Your identity is never shared. The owner sees a label like
-                  “Anonymous #1”.
-                </span>
+                <span class="hint">{{ 'scan.privacyHint' | t }}</span>
                 <button
                   type="submit"
                   class="btn btn-primary"
                   [disabled]="!text.trim() || chatStatus === 'sending'"
                 >
                   @if (chatStatus === 'sending') {
-                    Sending…
+                    {{ 'scan.sending' | t }}
                   } @else {
-                    Send message
+                    {{ 'scan.send' | t }}
                   }
                 </button>
               </div>
@@ -176,7 +183,7 @@
           </div>
         }
 
-        <footer class="powered">Powered by Raken</footer>
+        <footer class="powered">{{ 'scan.powered' | t }}</footer>
       </section>
       }
     }
